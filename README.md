@@ -7,7 +7,7 @@
 
 ## Ru-WireGuard
 
-- [Текущая спецификации](https://github.com/bi-zone/ruwireguard-spec/ruwireguard-draft.md)
+- [Текущая спецификации](ruwireguard-draft.md)
 - [Базовая спецификация](https://docs.google.com/document/d/1YncqzleySRWU8HzH7t7WrcIkQJTMMJm3OTE0jbu0K0A/edit?usp=sharing)
 - [Эталонная реализация](https://github.com/bi-zone/ruwireguard-go)
-- [Участники проекта](https://github.com/bi-zone/ruwireguard-spec/contributors.md)
+- [Участники проекта](contributors.md)

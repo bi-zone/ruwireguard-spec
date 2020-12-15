@@ -195,13 +195,13 @@ KDF_LABEL_1, KDF_LABEL_2, KDF_LABEL_3 являются константами о
 Значение Ii генерируется случайным образом.
 Остальные поля вычисляются следующим образом:
 ```
-si-pub := MarshallCompressed(Si-pub)
-sr-pub := MarshallCompressed(Sr-pub)
+si-pub := MarshalCompressed(Si-pub)
+sr-pub := MarshalCompressed(Sr-pub)
 Ci := Hash(Construction)
 Hi := Hash(Ci || Identifier)
 Hi := Hash(Hi || sr-pub)
 (Eipriv, Eipub) := DH-Generate()
-ei-pub := MarshallCompressed(Ei-pub)
+ei-pub := MarshalCompressed(Ei-pub)
 Ci := KDF1(Ci, ei-pub)
 msg.ephemeral := ei-pub
 Hi := Hash(Hi || msg.ephemeral)
@@ -215,17 +215,17 @@ Hi := Hash(Hi || msg.timestamp)
 
 Отвечающая сторона при получении данного сообщения выполняет следующие вычисления:
 ```
-sr-pub := MarshallCompressed(Sr-pub)
+sr-pub := MarshalCompressed(Sr-pub)
 Cr := Hash(Construction)
 Hr := Hash(Cr || Identifier)
 Hr := Hash(Hr || sr-pub)
 ei-pub := msg.ephemeral
-Ei-pub := UnmarshallCompressed(ei-pub)
+Ei-pub := UnmarshalCompressed(ei-pub)
 Cr := KDF1(Cr, ei-pub)
 Hr := Hash(Hr || msg.ephemeral)
 (Cr, K) := KDF2(Cr, DH(Sr-priv, Ei-pub))
 si-pub := AEAD-Decrypt(K, 0, si-pub, Hr)
-Si-pub := UnmarshallCompressed(si-pub)
+Si-pub := UnmarshalCompressed(si-pub)
 Hr := Hash(Hr || msg.static)
 (Cr , K) := KDF2(Cr, DH(Sr-priv, Si-pub))
 timestamp := AEAD-Decrypt(K, 0, msg.timestamp, Hr)
@@ -254,7 +254,7 @@ Hr := Hash(Hr || msg.timestamp)
 Значение Ir генерируется случайным образом. Остальные поля вычисляются следующим образом:
 ```
 (Er-priv, Er-pub) := DH-Generate()
-er-pub := MarshallCompressed(Er-pub)
+er-pub := MarshalCompressed(Er-pub)
 msg.ephemeral := er-pub
 Cr := KDF1(Cr, er-pub)
 Hr := Hash(Hr || msg.ephemeral)
@@ -269,7 +269,7 @@ Hr := Hash(Hr || msg.empty)
 Когда инициатор получает данное сообщение он выполняет следующие вычисления:
 ```
 er-pub := msg.ephemeral
-Er-pub := UnmarshallCompressed(er-pub)
+Er-pub := UnmarshalCompressed(er-pub)
 Ci := KDF1(Ci, er-pub)
 Hi := Hash(Hi || msg.ephemeral)
 Ci := KDF1(Ci, DH(Ei-priv, Er-pub))

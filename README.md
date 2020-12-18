@@ -9,5 +9,6 @@
 - [Введение и актуальность задачи](intro.md)
 - [Текущая версия спецификации](ruwireguard-draft.md)
 - [Базовая спецификация (архив)](https://docs.google.com/document/d/1YncqzleySRWU8HzH7t7WrcIkQJTMMJm3OTE0jbu0K0A/edit?usp=sharing)
-- [Эталонная реализация](https://github.com/bi-zone/ruwireguard-go)
+- [Эталонная реализация на языке Go](https://github.com/bi-zone/ruwireguard-go)
+- [Клиент для Windows](https://github.com/bi-zone/ruwireguard-windows)
 - [Участники проекта](contributors.md)

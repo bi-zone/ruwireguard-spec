@@ -145,24 +145,22 @@ KDF_LABEL_1, KDF_LABEL_2, KDF_LABEL_3 являются константами о
 ### Константы
 
 #### Construction
-Строка, длиной 57 байт, состоящая из следующих UTF–8 символов:
-“Noise_IKpsk2_GC256A_GOST_R_341112_256_WITH_KUZNYECHIK_MGM”.
+Строка, длиной 57 байт, состоящая из следующих UTF–8 символов: `Noise_IKpsk2_GC256A_GOST_R_341112_256_WITH_KUZNYECHIK_MGM`.
 
 #### Identifier
-Строка, длиной 42 байта, состоящая из следующих UTF–8 символов:
-“RU WireGuard v1 2020 zx2c4 Jason@zx2c4.com”.
+Строка, длиной 42 байта, состоящая из следующих UTF–8 символов: `RU WireGuard v1 2020 zx2c4 Jason@zx2c4.com`.
 
 #### Label–Mac1
-Строка, длиной 16 байт, состоящая из UTF-8 символов “RU mac1---- 2020”.
+Строка, длиной 16 байт, состоящая из UTF-8 символов `RU mac1---- 2020`.
 
 #### Label–Cookie
-Строка, длиной 16 байт, состоящая из UTF-8 символов “RU cookie-- 2020”.
+Строка, длиной 16 байт, состоящая из UTF-8 символов `RU cookie-- 2020`.
 
 #### Константы для KDF
 В функции KDFn используются следующие строки, длиной 32 байта:
- - KDF_LABEL_1 = "KDF_GOST_R_3411_2012_256_LABEL_1"
- - KDF_LABEL_2 = "KDF_GOST_R_3411_2012_256_LABEL_2"
- - KDF_LABEL_3 = "KDF_GOST_R_3411_2012_256_LABEL_3"
+ - KDF_LABEL_1 = `KDF_GOST_R_3411_2012_256_LABEL_1`
+ - KDF_LABEL_2 = `KDF_GOST_R_3411_2012_256_LABEL_2`
+ - KDF_LABEL_3 = `KDF_GOST_R_3411_2012_256_LABEL_3`
 
 ## Протокол Handshake
 В большинстве случаев в протоколе Handshake каждая из сторон отправляет по одному сообщению другой стороне,

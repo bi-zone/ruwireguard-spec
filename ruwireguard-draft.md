@@ -5,7 +5,6 @@
 - [Обозначения](#обозначения)
 - [Криптографические вычисления](#криптографические-вычисления)
   - [Используемые российские криптографические алгоритмы](#используемые-российские-криптографические-алгоритмы)
-  - [Представление точек эллиптической кривой](#представление-точек-эллиптической-кривой)
   - [Константы](#константы)
 - [Протокол Handshake](#протокол-handshake)
   - [Обработка первого сообщения](#обработка-первого-сообщения)
@@ -76,12 +75,18 @@ Nm-send, Nm-recv – уникальные вектора для шифрован
 
 #### Алгоритм согласования ключа
 В качестве алгоритма согласования ключа KEK_VKO(x, Y, UKM) используется алгоритм [VKO_GOSTR3410_2012_256](https://tc26.ru/standard/rs/%D0%A0%2050.1.113-2016.pdf).
+
 Операции над точками эллиптических кривых задаются в соответствии с ГОСТ Р 34.10–2012.
 
-DH-Generate() – функция генерации ключевой пары, соответствующей эллиптической кривой GC256A (полный идентификатор кривой [id-tc26-gost-3410-2012-256-paramSetA](https://tools.ietf.org/html/rfc7836)).
+Точки на эллиптической кривой представляются в сжатом формате в соответствии с [ANSI X9.62](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.202.2977&rep=rep1&type=pdf) (секции 4.3.6, 4.3.7).
 
-Функция DH определена следующим образом: DH(x, Y) = KEK_VKO(x, Y, UKM),
-где x – закрытый ключ, Y – открытый ключ противоположной стороны, UKM = 1, а ключевые пары (x, X), (y, Y) получены с использованием функции DH-Generate().
+Функция MarshalCompressed() преобразует координаты точки P = (x, y) на эллиптической кривой в байтовое представление в сжатом формате на основе алгоритма, определенного в секции 4.3.6 стандарта [ANSI X9.62](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.202.2977&rep=rep1&type=pdf). В таком представлении точка P на эллиптической кривой представляется в виде b || X, где X - байтовое представление первой координата x точки P, а b - байтовое представление константы 2 или 3 в зависимости от бита четности координаты y.
+
+Функция UnmarshalCompressed() по байтовому представлению в сжатом формате получает координаты точки P = (x, y) на эллиптической кривой на основе алгоритма, определенного в секции  4.3.7 стандарта [ANSI X9.62](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.202.2977&rep=rep1&type=pdf).
+
+DH-Generate() = (Xpriv, Xpub) – функция генерации ключевой пары, соответствующей эллиптической кривой GC256A (полный идентификатор кривой [id-tc26-gost-3410-2012-256-paramSetA](https://tools.ietf.org/html/rfc7836)). Открытый ключ Xpub представляется в сжатой форме.
+
+Функция DH определена следующим образом: DH(Xpriv, Ypub) = KEK_VKO(Xpriv, UnmarshalCompressed(Ypub), UKM), где Xpriv – закрытый ключ, Ypub – открытый ключ противоположной стороны, UKM = 1, а ключевые пары (Xpriv, Xpub), (Ypriv, Ypub) получены с использованием функции DH-Generate().
 
 #### Блочный шифр
 В качестве блочного шифра используется шифр “Кузнечик”, определенный в ГОСТ Р 34.12–2015.
@@ -195,18 +200,16 @@ KDF_LABEL_1, KDF_LABEL_2, KDF_LABEL_3 являются константами о
 Значение Ii генерируется случайным образом.
 Остальные поля вычисляются следующим образом:
 ```
-si-pub := MarshalCompressed(Si-pub)
-sr-pub := MarshalCompressed(Sr-pub)
 Ci := Hash(Construction)
 Hi := Hash(Ci || Identifier)
-Hi := Hash(Hi || sr-pub)
+Hi := Hash(Hi || Sr-pub)
 (Eipriv, Eipub) := DH-Generate()
-ei-pub := MarshalCompressed(Ei-pub)
-Ci := KDF1(Ci, ei-pub)
+Ei-pub := MarshalCompressed(Ei-pub)
+Ci := KDF1(Ci, Ei-pub)
 msg.ephemeral := ei-pub
 Hi := Hash(Hi || msg.ephemeral)
 (Ci, K) := KDF2(Ci, DH(Ei-priv, Sr-pub))
-msg.static := AEAD-Encrypt(K, 0, si-pub, Hi)
+msg.static := AEAD-Encrypt(K, 0, Si-pub, Hi)
 Hi := Hash(Hi || msg.static)
 (Ci , K) := KDF2(Ci, DH(Si-priv, Sr-pub))
 msg.timestamp := AEAD-Encrypt(K, 0, Timestamp(), Hi)
@@ -215,17 +218,14 @@ Hi := Hash(Hi || msg.timestamp)
 
 Отвечающая сторона при получении данного сообщения выполняет следующие вычисления:
 ```
-sr-pub := MarshalCompressed(Sr-pub)
 Cr := Hash(Construction)
 Hr := Hash(Cr || Identifier)
-Hr := Hash(Hr || sr-pub)
-ei-pub := msg.ephemeral
-Ei-pub := UnmarshalCompressed(ei-pub)
-Cr := KDF1(Cr, ei-pub)
+Hr := Hash(Hr || Sr-pub)
+Ei-pub := msg.ephemeral
+Cr := KDF1(Cr, Ei-pub)
 Hr := Hash(Hr || msg.ephemeral)
 (Cr, K) := KDF2(Cr, DH(Sr-priv, Ei-pub))
-si-pub := AEAD-Decrypt(K, 0, si-pub, Hr)
-Si-pub := UnmarshalCompressed(si-pub)
+Si-pub := AEAD-Decrypt(K, 0, si-pub, Hr)
 Hr := Hash(Hr || msg.static)
 (Cr , K) := KDF2(Cr, DH(Sr-priv, Si-pub))
 timestamp := AEAD-Decrypt(K, 0, msg.timestamp, Hr)
@@ -254,9 +254,8 @@ Hr := Hash(Hr || msg.timestamp)
 Значение Ir генерируется случайным образом. Остальные поля вычисляются следующим образом:
 ```
 (Er-priv, Er-pub) := DH-Generate()
-er-pub := MarshalCompressed(Er-pub)
-msg.ephemeral := er-pub
-Cr := KDF1(Cr, er-pub)
+msg.ephemeral := Er-pub
+Cr := KDF1(Cr, Er-pub)
 Hr := Hash(Hr || msg.ephemeral)
 Cr := KDF1(Cr, DH(Er-priv, Ei-pub))
 Cr := KDF1(Cr, DH(Er-priv, Si-pub))
@@ -268,9 +267,8 @@ Hr := Hash(Hr || msg.empty)
 
 Когда инициатор получает данное сообщение он выполняет следующие вычисления:
 ```
-er-pub := msg.ephemeral
-Er-pub := UnmarshalCompressed(er-pub)
-Ci := KDF1(Ci, er-pub)
+Er-pub := msg.ephemeral
+Ci := KDF1(Ci, Er-pub)
 Hi := Hash(Hi || msg.ephemeral)
 Ci := KDF1(Ci, DH(Ei-priv, Er-pub))
 Ci := KDF1(Ci, DH(Si-priv, Er-pub))

@@ -203,7 +203,7 @@ KDF_LABEL_1, KDF_LABEL_2, KDF_LABEL_3 являются константами о
 Ci := Hash(Construction)
 Hi := Hash(Ci || Identifier)
 Hi := Hash(Hi || Sr-pub)
-(Eipriv, Eipub) := DH-Generate()
+(Ei-priv, Ei-pub) := DH-Generate()
 Ei-pub := MarshalCompressed(Ei-pub)
 Ci := KDF1(Ci, Ei-pub)
 msg.ephemeral := ei-pub
@@ -225,7 +225,7 @@ Ei-pub := msg.ephemeral
 Cr := KDF1(Cr, Ei-pub)
 Hr := Hash(Hr || msg.ephemeral)
 (Cr, K) := KDF2(Cr, DH(Sr-priv, Ei-pub))
-Si-pub := AEAD-Decrypt(K, 0, si-pub, Hr)
+Si-pub := AEAD-Decrypt(K, 0, msg.static, Hr)
 Hr := Hash(Hr || msg.static)
 (Cr , K) := KDF2(Cr, DH(Sr-priv, Si-pub))
 timestamp := AEAD-Decrypt(K, 0, msg.timestamp, Hr)
@@ -281,12 +281,12 @@ msg.empty := AEAD-Decrypt(K, 0, ε, Hi)
 
 ### Вычисление кодов аутентификации сообщений
 Сообщения протокола Handshake содержат поля mac1 и mac2.
-Пусть msg-ɑ и msg-ϐ обозначает все байты первого или второго сообщений Handshake до полей mac1 и mac2 соответственно.
+Пусть msgɑ и msgϐ обозначает все байты первого или второго сообщений Handshake до полей mac1 и mac2 соответственно.
 Обозначим через L* значение cookie, полученное ℒ* секунд назад.
 Тогда поля mac1 и mac2 формируются следующим образом:
 ```
-msg.mac1 := HMAC(Hash(Label-MAC1 || Sm’-pub), msg-ɑ)
-Если Lm = ε или ℒm≥120, то msg.mac2 := 0^32, иначе msg.mac2 := HMAC(Lm, msg-ϐ)
+msg.mac1 := HMAC(Hash(Label-MAC1 || Sm’-pub), msgɑ)
+Если Lm = ε или ℒm≥120, то msg.mac2 := 0^32, иначе msg.mac2 := HMAC(Lm, msgϐ)
 ```
 
 ### Вычисление ключевого материала

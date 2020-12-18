@@ -194,7 +194,6 @@ Ci := Hash(Construction)
 Hi := Hash(Ci || Identifier)
 Hi := Hash(Hi || Sr-pub)
 (Ei-priv, Ei-pub) := DH-Generate()
-Ei-pub := MarshalCompressed(Ei-pub)
 Ci := KDF1(Ci, Ei-pub)
 msg.ephemeral := Ei-pub
 Hi := Hash(Hi || msg.ephemeral)
